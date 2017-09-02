@@ -5,23 +5,26 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.kapibary.capybaramessengerbot.dao.model.AnswerJson;
-import eu.kapibary.capybaramessengerbot.dao.model.Question;
-import eu.kapibary.capybaramessengerbot.dao.model.Survey;
-import eu.kapibary.capybaramessengerbot.dao.model.SurveyOverall;
+import eu.kapibary.capybaramessengerbot.dao.model.*;
 import eu.kapibary.capybaramessengerbot.repositories.SurveyProgress;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SurveyDao {
 
     private final static String BASE_URL = "https://bb92f869.ngrok.io";
 
-    public static List<SurveyOverall> getAvailableSurveyList() {
-        List<SurveyOverall> surveyOverallList = new ArrayList<>();
-        surveyOverallList.add(new SurveyOverall(1L, "Our customers feedback"));
-        return surveyOverallList;
+    public static List<SurveyOverall> getAvailableSurveyList(String userId) throws UnirestException {
+        String response = Unirest
+                .get(BASE_URL + "/companies/0/users/" + userId)
+                .asString().getBody();
+        SurveyOverall[] surveyOverallArray = new Gson().fromJson(response, SurveyOverall[].class);
+
+        /*List<SurveyOverall> surveyOverallList = new ArrayList<>();
+        surveyOverallList.add(new SurveyOverall(1L, "Our customers feedback"));*/
+        return new ArrayList<>(Arrays.asList(surveyOverallArray));
     }
 
     public static Survey getSurvey(Integer surveyId) throws UnirestException {
@@ -41,12 +44,16 @@ public class SurveyDao {
         return survey;
     }
 
-    public static String getVoucher(String userId, SurveyProgress surveyProgress) throws UnirestException {
+    public static VoucherJson getVoucher(String userId, SurveyProgress surveyProgress) throws UnirestException {
         AnswerJson answerJson = new AnswerJson(surveyProgress.getSurveyId(), surveyProgress.getAnswers());
-        return Unirest
-                .post(BASE_URL + "/companies/1/users/" + userId)
-                .body(answerJson)
+        String json = new Gson().toJson(answerJson);
+        String response = Unirest
+                .post(BASE_URL + "/companies/0/users/" + userId)
+                .header("content-type", "application/json;charset=UTF-8")
+                .body(json)
                 .asString()
                 .getBody();
+        VoucherJson voucherJson = new Gson().fromJson(response, VoucherJson.class);
+        return voucherJson;
     }
 }

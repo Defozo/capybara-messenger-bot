@@ -7,6 +7,7 @@ import eu.kapibary.capybaramessengerbot.apiai.model.ContextOut;
 import eu.kapibary.capybaramessengerbot.dao.SurveyDao;
 import eu.kapibary.capybaramessengerbot.dao.model.AnswerJson;
 import eu.kapibary.capybaramessengerbot.dao.model.Survey;
+import eu.kapibary.capybaramessengerbot.dao.model.VoucherJson;
 import eu.kapibary.capybaramessengerbot.repositories.UserRepository;
 
 import java.util.ArrayList;
@@ -32,8 +33,12 @@ public class AnswerQuestionHandler implements IntentHandler {
         } else {
             List<ContextOut> contextOuts = new ArrayList<>();
             apiAIResponse.setContextOut(contextOuts);
-            SurveyDao.getVoucher(userId, userIdsWithProgress.get(userId));
-            response = "Thank you for you answers! Here is your promo code worth 30 PLN in our store: xGg34FStfs46Gd.";
+            VoucherJson voucher = SurveyDao.getVoucher(userId, userIdsWithProgress.get(userId));
+            if (voucher.getDiscount().getType().equals("AMOUNT")) {
+                response = "Thank you for you answers! Here is your promo code worth " + voucher.getDiscount().getAmountOff() + " PLN in our store: " + voucher.getCode();
+            } else {
+                response = "Thank you for you answers! Here is your promo code which gives you " + voucher.getDiscount().getPercentOff() + "% off in our store: " + voucher.getCode();
+            }
         }
         apiAIResponse.setDisplayText(response);
         apiAIResponse.setSpeech(response);
