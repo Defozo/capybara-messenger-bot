@@ -23,7 +23,10 @@ repositories {
 
 
 dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
+	runtime('com.h2database:h2')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	compile group: 'ai.api', name: 'libai', version: '1.4.6'
 	compile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'

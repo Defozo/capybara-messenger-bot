@@ -20,6 +20,18 @@ public class Parameters {
     @Expose
     private String answer;
 
+    public String getSurveyId() {
+        return surveyId;
+    }
+
+    public void setSurveyId(String surveyId) {
+        this.surveyId = surveyId;
+    }
+
+    @SerializedName("surveyId")
+    @Expose
+    private String surveyId;
+
     public String getAnswer() {
         return answer;
     }
